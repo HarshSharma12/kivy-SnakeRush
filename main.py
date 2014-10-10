@@ -63,9 +63,6 @@ class GameSetup(BoxLayout):
         hardButton = Button(text = "HARD", size_hint = (0.4, 0.5))
         hardButton.bind(on_press = self.startNormal)
         
-        custButton = Button(text = "CUSTOM", size_hint = (0.4, 0.5))
-        custButton.bind(on_press = self.startNormal)
-        
         helpButton = Button(text = "HELP", size_hint = (0.4, 0.5))
         helpButton.bind(on_press = self.loadHelp)
         
@@ -75,7 +72,7 @@ class GameSetup(BoxLayout):
         exitButton = Button(text = "EXIT", size_hint = (0.4, 0.5))
         exitButton.bind(on_press = self.askExit)
         
-        for but in [normalButton, hardButton, custButton, helpButton, scoreButton, exitButton]:
+        for but in [normalButton, hardButton, helpButton, scoreButton, exitButton]:
             self.add_widget(but)
             
     def startNormal(self, obj):	
@@ -144,37 +141,31 @@ class SnakeRushGame(Widget):
         self.data['div']=(160.0,92.0)
         self.data['pix']=(800.0,600.0)
         divx,divy = int(self.data['div'][0]),int(self.data['div'][1])
-        print divx
-        print ''
-        print ''
-        print divy
-        self.data['occupied'] = list()
-        print self.data
         
+        self.data['occupied'] = list()
+        ## INITIALIZE THE ARRAY TO ALL ZEROS
         for i in range(divx*divy):
             self.data['occupied'] += [0]
+        
+        ## FOR GAME TO END ON HORIZONTAL BOUNDARY TOUCH
         for i in range(divx):
             self.data['occupied'][i]=1
             self.data['occupied'][-i-1]=1
+            
+        ## FOR GAME TO END ON VERTICAL BOUNDARY TOUCH
         for i in range(divy):
             self.data['occupied'][i*divx]=1
         for i in range(1,divy+1):
             self.data['occupied'][(i*divx)-1]=1
         
         
-        #Uncomment following to check if initial matrix is generated properly
-        
-        #print self.data.values()[2]
-        
-        self.snake1.pos = self.width/6,self.top/6
-        #self.snake2.pos = self.width*5/6,self.top*5/6
+        self.snake1.pos = self.width/9,self.top/6
         self.snake1.velocity = (8,0)
-        #self.snake2.velocity = (-8,0)
+        
         with self.canvas:
             Color(255,255,0)
             self.data["line1"] = Line(points = (self.snake1.center_x,self.snake1.center_y))
-#            Color(0,191,255)
-#            self.data["line2"] = Line(points = (self.snake2.center_x,self.snake2.center_y))
+            print self.data["line1"]
             
 
     def move_up(self):
@@ -212,32 +203,8 @@ class SnakeRushGame(Widget):
                 self.move_up()                    
             else:
                 self.move_down()
-                
-
-#    touch_arr=[]
-#    xdir = [0,0]
-#    ydir = [0,0]
-#    def on_touch_move(self, touch): #FOR SWIPE ACTION
-#        self.touch_arr.append([touch.x, touch.y])
-#        self.xdir = self.touch_arr[0][0] - self.touch_arr[len(self.touch_arr)-1][0]
-#        self.ydir = self.touch_arr[0][1] - self.touch_arr[len(self.touch_arr)-1][1]
-#        
-#    def on_touch_up(self, touch):
-#        
-#        if(self.snake1.xarr[len(self.snake1.xarr)-1]-self.snake1.xarr[len(self.snake1.xarr)-2]==0): 
-#            if(self.xdir>0 and self.ydir<15):
-#                self.move_right()
-#            elif(self.xdir<0 and self.ydir<15):
-#                self.move_left()
-#        elif(self.snake1.yarr[len(self.snake1.yarr)-1]-self.snake1.yarr[len(self.snake1.yarr)-2]==0):
-#            if(self.xdir<15 and self.ydir>0):
-#                self.move_up()
-#            elif(self.xdir<15 and self.ydir<0):
-#                self.move_down()
-#        self.touch_arr=[]
-#        
-                    
-                    
+         
+           
     def update(self,dt):
         a = self.snake1.move1(self.data)
         #b = self.snake2.move2(self.data)
@@ -273,16 +240,6 @@ class Snake(Widget):
         self.yarr.append(self.pos[1])
         data['occupied'][n] = 1
         
-        return True
-    
-    def move2(self,data):
-        if self.check(data):
-            return False
-        self.pos = Vector(*self.velocity)+self.pos
-        data["line2"].points += (self.center_x,self.center_y)
-        n = self.convert(data)
-        #print "    ",n
-        data['occupied'][n] = 1
         return True
     
     def convert(self,data):
