@@ -10,6 +10,7 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.vector import Vector
 from kivy.factory import Factory
@@ -40,13 +41,22 @@ class SnakeRushApp(App):
 	
 class GameSetup(BoxLayout):
     def __init__(self,**kwargs):
+        '''############## INITIALIZE THE GAME by ##############
+           ############## PLACING BUTTONS AND CALLING APPROPRIATE METHODS ##############'''
         super(GameSetup, self).__init__(**kwargs)
+		
+		############## NEXT 2 LINES APLICABLE ONLY AFTER SECOND CALL ##############
+		
         self.root = FloatLayout()
         self.clear_widgets()
+		
+		############## ADD BUTTONS TO HOME SCREEN ##############
+		
         self.orientation = "vertical"
         self.padding = 90
         self.spacing = 10
         self.pos_hint = {'x':0.22, 'y':0.05}
+		
         normalButton = Button(text="NORMAL", size_hint = (0.4, 0.5))
         normalButton.bind(on_press = self.startNormal)
         
@@ -68,18 +78,20 @@ class GameSetup(BoxLayout):
         for but in [normalButton, hardButton, custButton, helpButton, scoreButton, exitButton]:
             self.add_widget(but)
             
-    def startNormal(self, obj):
+    def startNormal(self, obj):	
+        '''############## BEGIN A NORMAL GAME - 2 SNAKES ##############	'''
         self.clear_widgets()
         game = SnakeRushGame()
         game.width = 800
         game.top = 600
+        
         game.begin(self)
         Clock.schedule_interval(game.update,1.0/15.0)
         self.add_widget(game)
         return self
         
-    def loadHelp(self,obj):
-        #app = self
+    def loadHelp(self,obj):        
+        '''############## LOAD THE HELP SCREEN IMAGE ##############'''
         self.clear_widgets()
         helpimg = Image(source = 'assets/help.jpg')
         back = Button(text = "BACK",font_size = 25)
@@ -91,7 +103,7 @@ class GameSetup(BoxLayout):
         return self
         
     def loadScores(self, obj):
-        #app = self
+        '''############## HIGH SCORES (TOP 5) ##############'''
         self.clear_widgets()
         helpimg = Image(source = 'assets/help.jpg')
         back = Button(text = "BACK",font_size = 25)
@@ -103,6 +115,7 @@ class GameSetup(BoxLayout):
         return self
     
     def askExit(self, obj):
+	'''############## TO CONFIRM ON EXIT ##############'''
         p = ExitPopup()
         p.open()
 
@@ -140,7 +153,6 @@ class SnakeRushGame(Widget):
         
         for i in range(divx*divy):
             self.data['occupied'] += [0]
-            '''
         for i in range(divx):
             self.data['occupied'][i]=1
             self.data['occupied'][-i-1]=1
@@ -148,7 +160,8 @@ class SnakeRushGame(Widget):
             self.data['occupied'][i*divx]=1
         for i in range(1,divy+1):
             self.data['occupied'][(i*divx)-1]=1
-        '''
+        
+        
         #Uncomment following to check if initial matrix is generated properly
         
         #print self.data.values()[2]
@@ -163,9 +176,6 @@ class SnakeRushGame(Widget):
 #            Color(0,191,255)
 #            self.data["line2"] = Line(points = (self.snake2.center_x,self.snake2.center_y))
             
-        #Change these images
-    winner1 = Image(source = 'assets/bluewins.jpg')
-    winner2 = Image(source = 'assets/yellowwins.jpg')
 
     def move_up(self):
         self.snake1.velocity = Vector(*self.snake1.velocity).rotate(90)
@@ -188,7 +198,7 @@ class SnakeRushGame(Widget):
             self.snake1.velocity[0]=-self.snake1.velocity[0]
     
 
-    def on_touch_down(self, touch): #FOR TOUCH ACTION
+    def on_touch_down(self, touch): #FOR SINGLE TOUCH
         self.t=[]
         touch.x, touch.y
         if(self.snake1.xarr[len(self.snake1.xarr)-1]-self.snake1.xarr[len(self.snake1.xarr)-2]==0):
@@ -236,10 +246,13 @@ class SnakeRushGame(Widget):
             #app = self.app
             root.clear_widgets()
             if a == False:
-                root.add_widget(self.winner1)
-#            if b == False:
-#                root.add_widget(self.winner2)
-#            
+                ######### SPACE(After OVER) ONLY TO ALIGN THE TEXT #############
+                over = """
+                [anchor=title1][size=74]GAME OVER                      [/size]
+                """
+                score=""" """
+                text = over+score
+                root.add_widget(Label(text=text, markup=True))
             return False
 
   
