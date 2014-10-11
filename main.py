@@ -81,8 +81,8 @@ class GameSetup(BoxLayout):
         game = SnakeRushGame()
         game.width = 800
         game.top = 600
-        
-        game.begin(self)
+        flag=1
+        game.begin(self, flag)
         Clock.schedule_interval(game.update,1.0/15.0)
         self.add_widget(game)
         return self
@@ -129,34 +129,44 @@ class SnakeRushGame(Widget):
     snake1 = ObjectProperty(None)
 #    snake2 = ObjectProperty(None)
     
-    def begin(self,root):
+    def begin(self,root,flag):
         self.root = root
         y=self.top
         x=self.width
-        with self.canvas:
-            Rectangle(pos=(0,0),size=(x/126,y))
-            Rectangle(pos=(0,0),size=(x,y/80))
-            Rectangle(pos=(x-x/126,0),size=(x/126,y))
-            Rectangle(pos=(0,y-y/80),size=(x,y/80))
+
         self.data['div']=(160.0,92.0)
         self.data['pix']=(800.0,600.0)
         divx,divy = int(self.data['div'][0]),int(self.data['div'][1])
         
         self.data['occupied'] = list()
+        self.data['hbot'] = list()
+        self.data['htop'] = list()
+        self.data['vleft'] = list()
+        self.data['vright'] = list()
         ## INITIALIZE THE ARRAY TO ALL ZEROS
         for i in range(divx*divy):
             self.data['occupied'] += [0]
         
         ## FOR GAME TO END ON HORIZONTAL BOUNDARY TOUCH
         for i in range(divx):
-            self.data['occupied'][i]=1
-            self.data['occupied'][-i-1]=1
+            if(flag==1):
+                self.data['occupied'][i]=1
+                self.data['occupied'][-i-1]=1
+            else:
+                self.data['hbot']+=1
+                self.data['htop']+=1
             
         ## FOR GAME TO END ON VERTICAL BOUNDARY TOUCH
         for i in range(divy):
-            self.data['occupied'][i*divx]=1
+            if(flag==1):
+                self.data['occupied'][i*divx]=1
+            else:
+                self.data['vleft']+=1
         for i in range(1,divy+1):
-            self.data['occupied'][(i*divx)-1]=1
+            if(flag==1):
+                self.data['occupied'][(i*divx)-1]=1
+            else:
+                self.data['vright']+=1
         
         
         self.snake1.pos = self.width/9,self.top/6
