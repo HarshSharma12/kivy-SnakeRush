@@ -21,7 +21,7 @@ from kivy.properties import ObjectProperty,DictProperty
 from kivy.graphics import Line,Color,Rectangle
 from kivy.lang import Builder
 from math import floor
-import sys
+
 
 
 Builder.load_string('''
@@ -30,7 +30,7 @@ Builder.load_string('''
     title: 'SURE ?'
 	Button:
 		text: 'CLICK TO EXIT'
-		on_press: sys.exit()
+		on_press: exit()
 
 ''')
 
@@ -57,10 +57,10 @@ class GameSetup(BoxLayout):
         self.spacing = 10
         self.pos_hint = {'x':0.22, 'y':0.05}
 		
-        normalButton = Button(text="NORMAL", size_hint = (0.4, 0.5))
+        normalButton = Button(text="SNAKE", size_hint = (0.4, 0.5))
         normalButton.bind(on_press = self.startNormal)
         
-        hardButton = Button(text = "HARD", size_hint = (0.4, 0.5))
+        hardButton = Button(text = "SNAKE RUSH", size_hint = (0.4, 0.5))
         hardButton.bind(on_press = self.startNormal)
         
         helpButton = Button(text = "HELP", size_hint = (0.4, 0.5))
@@ -90,25 +90,35 @@ class GameSetup(BoxLayout):
     def loadHelp(self,obj):        
         '''############## LOAD THE HELP SCREEN IMAGE ##############'''
         self.clear_widgets()
-        helpimg = Image(source = 'assets/help.jpg')
-        back = Button(text = "BACK",font_size = 25)
-        helpimg.add_widget(back)
-        self.add_widget(helpimg)
+        text = """ """
+        ht = open('D:\Others\kivy-SnakeRush\help.txt','r')
+        for line in ht.readlines():
+            text +=line
+        print text
+        self.add_widget(Label(text=text, markup=True))
+        back = Button(text = "BACK",font_size = 15, size_hint = (0.15, 0.14), pos_hint = {'x':0, 'y':0})
+        self.add_widget(back)        
         def backfn(obj):
             self.__init__()
         back.bind(on_press = backfn)
+        ht.close()
         return self
         
     def loadScores(self, obj):
-        '''############## HIGH SCORES (TOP 5) ##############'''
+        '''############## LOAD THE HELP SCREEN IMAGE ##############'''
         self.clear_widgets()
-        helpimg = Image(source = 'assets/help.jpg')
-        back = Button(text = "BACK",font_size = 25)
-        helpimg.add_widget(back)
-        self.add_widget(helpimg)
+        text = """ """
+        ht = open('D:\Others\kivy-SnakeRush\scores.txt','r')
+        for line in ht.readlines():
+            text +=line
+        print text
+        self.add_widget(Label(text=text, markup=True))
+        back = Button(text = "BACK",font_size = 15, size_hint = (0.15, 0.14), pos_hint = {'x':0, 'y':0})
+        self.add_widget(back)        
         def backfn(obj):
             self.__init__()
         back.bind(on_press = backfn)
+        ht.close()
         return self
     
     def askExit(self, obj):
