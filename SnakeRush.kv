@@ -4,22 +4,31 @@
     size:(1300,800)
     pos:(0,0)
     snake1:snake1
-    snake2:snake2
+    food1:food1
     
     Snake:
         id:snake1
         canvas:
             Color:
                 rgb: (255,255,0)
-            
-    Snake:
-        id:snake2
-        canvas:
-            Color:
-                rgb: (0,191,255)
+     
+	Sprite:
+		id:food1
+		canvas:
+			Color:
+                rgb: (255,0,0)
+		
         
 <Snake>:
     size:10,10
+    canvas:
+        Ellipse:
+            size:self.size 
+            pos:self.pos   
+
+			
+<Sprite>:
+    size:5,5
     canvas:
         Ellipse:
             size:self.size 

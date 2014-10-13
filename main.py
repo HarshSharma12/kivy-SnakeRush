@@ -21,8 +21,8 @@ from kivy.properties import ObjectProperty,DictProperty
 from kivy.graphics import Line,Color,Rectangle
 from kivy.lang import Builder
 from math import floor
-
-
+import sys
+from random import randint
 
 Builder.load_string('''
 <ExitPopup>:
@@ -74,7 +74,7 @@ class GameSetup(BoxLayout):
         
         for but in [normalButton, hardButton, helpButton, scoreButton, exitButton]:
             self.add_widget(but)
-            
+           
     def startNormal(self, obj):	
         '''############## BEGIN A NORMAL GAME - 2 SNAKES ##############	'''
         self.clear_widgets()
@@ -88,7 +88,7 @@ class GameSetup(BoxLayout):
         return self
         
     def loadHelp(self,obj):        
-        '''############## LOAD THE HELP SCREEN IMAGE ##############'''
+        '''############## LOAD THE HELP SCREEN ##############'''
         self.clear_widgets()
         text = """ """
         ht = open('D:\Others\kivy-SnakeRush\help.txt','r')
@@ -105,7 +105,7 @@ class GameSetup(BoxLayout):
         return self
         
     def loadScores(self, obj):
-        '''############## LOAD THE HELP SCREEN IMAGE ##############'''
+        '''############## LOAD THE HIGH SCORES ##############'''
         self.clear_widgets()
         text = """ """
         ht = open('D:\Others\kivy-SnakeRush\scores.txt','r')
@@ -125,8 +125,8 @@ class GameSetup(BoxLayout):
 	'''############## TO CONFIRM ON EXIT ##############'''
         p = ExitPopup()
         p.open()
-
 		
+
 class ExitPopup(Popup):
     pass
 	
@@ -137,13 +137,17 @@ class SnakeRushGame(Widget):
     #These two steps are done just so that the dict is properly initialized.
     data = DictProperty(a)
     snake1 = ObjectProperty(None)
-#    snake2 = ObjectProperty(None)
-    
-    def begin(self,root,flag):
+    food1 = ObjectProperty(None)
+
+    def begin(self,root):
         self.root = root
         y=self.top
         x=self.width
-
+        with self.canvas:
+            Rectangle(pos=(0,0),size=(x/126,y))
+            Rectangle(pos=(0,0),size=(x,y/80))
+            Rectangle(pos=(x-x/126,0),size=(x/126,y))
+            Rectangle(pos=(0,y-y/80),size=(x,y/80))
         self.data['div']=(160.0,92.0)
         self.data['pix']=(800.0,600.0)
         divx,divy = int(self.data['div'][0]),int(self.data['div'][1])
@@ -178,14 +182,11 @@ class SnakeRushGame(Widget):
             else:
                 self.data['vright']+=1
         
-        
-        self.snake1.pos = self.width/9,self.top/6
+        self.snake1.pos = self.width/6,self.top/6
         self.snake1.velocity = (8,0)
-        
         with self.canvas:
             Color(255,255,0)
             self.data["line1"] = Line(points = (self.snake1.center_x,self.snake1.center_y))
-            print self.data["line1"]
             
 
     def move_up(self):
@@ -223,10 +224,12 @@ class SnakeRushGame(Widget):
                 self.move_up()                    
             else:
                 self.move_down()
-         
-           
+                
+
+                    
     def update(self,dt):
         a = self.snake1.move1(self.data)
+        self.food1.dispSprite(self.data)
         #b = self.snake2.move2(self.data)
         if (a)!=True:
             root = self.root
@@ -254,13 +257,11 @@ class Snake(Widget):
         if self.check(data):
             return False
         self.pos = Vector(*self.velocity)+self.pos
-        data["line1"].points += (self.center_x,self.center_y)
-        n = self.convert(data)
+        data["line1"].points = (self.center_x,self.center_y)
         self.xarr.append(self.pos[0])
         self.yarr.append(self.pos[1])
-        data['occupied'][n] = 1
-        
         return True
+    
     
     def convert(self,data):
         x_pix,y_pix = data['pix']
@@ -283,11 +284,6 @@ class Snake(Widget):
         y = floor(float(y)/float(y_pix/divy))
         n = (divx)*y + x
         if n<divx*divy:
-            #Uncomment folowwing to debug
-            ''''
-            print "----------"
-            print "check at",pos,int(n)
-            '''
             return int(n)
         else:
             print "large value",n,self.pos,x,y
@@ -296,25 +292,38 @@ class Snake(Widget):
     def check(self,data):
         pos = Vector(*self.velocity)+self.pos
         if data['occupied'][self.convert1(pos,data)]==1:
-            #Uncomment the following to debug
-            '''
-            print self.uid,"Died at",pos,self.convert1(pos,data)
-            print "game over"
-            divx,divy = int(data['div'][0]),int(data['div'][1])
-            m = dict()
-            string = ""
-            for i in range(divy):
-                string = ""
-            for j in range(divx):
-                string  += str(data['occupied'][(i*divx)+j])
-            #sys.stdout.write(str(data['occupied'][(i*divx)+j]))
-            #print "\n
-            m[str(i)]=str(string)
-            for i in range(divy-1,-1,-1):
-                print m[str(i)]
-            '''
             return(1)
 
+
+class Sprite(Widget):
+    def dispSprite(self,data):
+        x_pix,y_pix = data['pix']
+        divx,divy = data['div']
+        
+        data['sprite'] = list()
+        for i in range(int(divx*divy)):
+            data['sprite'] += [0]
+        
+        x = 50
+        y = 70
+        sPos = x,y
+        x = floor(float(x)/float(x_pix/divx))
+        y = floor(float(y)/float(y_pix/divy))
+        print sPos
+        if(data['occupied'][int(x)]!=1):
+            data['sprite'][int(x)] = 1;
+        if(data['occupied'][int(y)]!=1):
+            data['sprite'][int(y)] = 1;
+        with self.canvas:
+            Color(1, 1, 0, 1, mode='rgba')
+            Rectangle(pos=sPos, size=(10,10))
+        
+        
+        if(data['line1'].points == sPos):
+            self.canvas.clear()
+	
+	
+	
 Factory.register("SnakeRushGame",SnakeRushGame)
 Factory.register("Snake",Snake)
 
